@@ -1,0 +1,19 @@
+{
+    "name": "try-again-later/media-convert-app-websockets",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "TryAgainLater\\MediaConvertAppWebsockets\\": "src/"
+        }
+    },
+    "scripts": {
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -d variables_order=EGPCS ./src/server.php"
+        ]
+    },
+    "require": {
+        "cboden/ratchet": "^0.4.4",
+        "php-amqplib/php-amqplib": "^3.2"
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "name": "try-again-later/media-convert-app-worker",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "TryAgainLater\\MediaConvertAppWorker\\": "src/"
+        }
+    },
+    "scripts": {
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -d variables_order=EGPCS ./src/worker.php"
+        ]
+    },
+    "require": {
+        "php-amqplib/php-amqplib": "^3.2",
+        "aws/aws-sdk-php": "^3.233",
+        "vlucas/phpdotenv": "^5.4"
+    }
+}
