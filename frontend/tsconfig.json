@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "strict": true,
+    "paths": {
+      "@root/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.{ts, d.ts, tsx, vue}"]
+}
