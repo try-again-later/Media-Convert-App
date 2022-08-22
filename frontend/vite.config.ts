@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: './src',
+  envDir: resolve(__dirname),
   build: {
     rollupOptions: {
       input: {
@@ -23,4 +24,7 @@ export default defineConfig({
       },
     ],
   },
+  server: {
+    cors: true,
+  }
 });
