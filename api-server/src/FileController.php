@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace TryAgainLater\MediaConvertAppApi;
 
+use ZMQContext;
+use ZMQ;
+
 class FileController
 {
     // 20 Mb
@@ -64,6 +67,11 @@ class FileController
             http_response_code(400);
             return;
         }
+
+        $context = new ZMQContext();
+        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect('tcp://localhost:5555');
+        $socket->send($newFileName);
 
         http_response_code(200);
     }

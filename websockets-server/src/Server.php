@@ -19,6 +19,10 @@ class Server implements MessageComponentInterface
         $this->clients = new SplObjectStorage;
     }
 
+    public function onFileUpload(string $file) {
+        echo "File '$file' uploaded!" . PHP_EOL;
+    }
+
     public function onOpen(ConnectionInterface $connection)
     {
         $this->clients->attach($connection);

@@ -7,14 +7,14 @@ const props = defineProps<{
   apiServer: string;
 }>();
 
-const connection = ref<WebSocket>();
+// const connection = ref<WebSocket>();
 
-onMounted(() => {
-  connection.value = new WebSocket(props.websocketsServer);
-  connection.value.onopen = () => {
-    console.log('Established connection through websockets!');
-  };
-});
+// onMounted(() => {
+//   connection.value = new WebSocket(props.websocketsServer);
+//   connection.value.onopen = () => {
+//     console.log('Established connection through websockets!');
+//   };
+// });
 
 const fileInput = ref<HTMLInputElement>();
 
@@ -26,7 +26,7 @@ const onFileChosen = async () => {
 
   const formData = new FormData();
   formData.append('file', file);
-  const uploadResult = await fetch(import.meta.env.VITE_API_SERVER + '/upload', {
+  const uploadResult = await fetch(props.apiServer + '/upload', {
     method: 'POST',
     mode: 'cors',
     body: formData,
