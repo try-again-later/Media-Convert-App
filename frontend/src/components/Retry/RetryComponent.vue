@@ -49,6 +49,7 @@ onMounted(async () => {
 const { pause: timerPause, resume: timerResume } = useIntervalFn(async () => {
   if (props.status == 'success' || props.status == 'first-try') {
     timerPause();
+    return;
   }
 
   timeLeft.value = Math.max(timeLeft.value - 1, 0);
@@ -62,7 +63,11 @@ const { pause: timerPause, resume: timerResume } = useIntervalFn(async () => {
 watch(
   () => props.status,
   async (status, prevStatus) => {
-    if (prevStatus == 'success') {
+    if (status == 'first-try') {
+      return;
+    }
+
+    if (prevStatus == 'success' || prevStatus == 'first-try') {
       timerResume();
     }
 
@@ -74,7 +79,7 @@ watch(
       timerPause();
     }
 
-    if (status == 'waiting' && prevStatus != 'success') {
+    if (status == 'waiting' && prevStatus != 'success' && prevStatus != 'first-try') {
       timeLeft.value = Math.min(
         Math.ceil(previousTimeLeft.value * props.nextTimeCoefficient),
         props.maxTimeLeft,
