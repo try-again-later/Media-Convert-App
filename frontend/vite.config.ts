@@ -22,9 +22,13 @@ export default defineConfig({
         find: '@root',
         replacement: resolve(__dirname, 'src'),
       },
+      {
+        find: '@components',
+        replacement: resolve(__dirname, 'src', 'components'),
+      },
     ],
   },
   server: {
     cors: true,
-  }
+  },
 });

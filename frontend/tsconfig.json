@@ -4,8 +4,10 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
+    "jsx": "preserve",
     "paths": {
-      "@root/*": ["./src/*"]
+      "@root/*": ["./src/*"],
+      "@components/*": ["./src/components/*"]
     }
   },
   "include": ["src/**/*.{ts, d.ts, tsx, vue}"]

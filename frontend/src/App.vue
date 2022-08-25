@@ -1,20 +1,34 @@
 <script setup lang="ts">
-import { PaperClipIcon } from '@heroicons/vue/outline';
-import { onMounted, ref } from 'vue';
+import { PaperClipIcon } from '@heroicons/vue/24/outline';
+import Retry from './components/Retry/RetryComponent.vue';
+
+import { ref } from 'vue';
+import { Status } from './components/Retry/RetryComponent';
 
 const props = defineProps<{
   websocketsServer: string;
   apiServer: string;
 }>();
 
-// const connection = ref<WebSocket>();
+const connectionStatus = ref<Status>('first-try');
+const connection = ref<WebSocket>();
 
-// onMounted(() => {
-//   connection.value = new WebSocket(props.websocketsServer);
-//   connection.value.onopen = () => {
-//     console.log('Established connection through websockets!');
-//   };
-// });
+const retryConnection = async () => {
+  connection.value = await new Promise<WebSocket>((resolve, reject) => {
+    const webSocket = new WebSocket(props.websocketsServer);
+
+    webSocket.onopen = () => {
+      console.log('Established connection through websockets!');
+      resolve(webSocket);
+    };
+
+    webSocket.onerror = () => {
+      console.error('Failed to connect to the websockets server...');
+      webSocket.close();
+      reject();
+    };
+  });
+};
 
 const fileInput = ref<HTMLInputElement>();
 
@@ -55,9 +69,17 @@ const onFileChosen = async () => {
         />
         <label for="file" class="btn gap-2 btn-primary">
           <PaperClipIcon class="w-6 h-6" />
-          <span>Upload a new image</span>
+          <span>Upload</span>
         </label>
       </div>
     </section>
+
+    <aside class="toast">
+      <Retry :workload="retryConnection" v-model:status="connectionStatus">
+        <template #error>Failed to connect to the server.</template>
+        <template #retrying>Trying to connect to the server...</template>
+        <template #success>Successfully connected!</template>
+      </Retry>
+    </aside>
   </main>
 </template>
