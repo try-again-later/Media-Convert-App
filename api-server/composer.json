@@ -9,12 +9,13 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "php -S localhost:8080 -d variables_order=EGPCS -d upload_max_filesize=40M -d post_max_size=40M -t ./public"
+            "php -S localhost:8080 -c ./php.ini -t ./public"
         ]
     },
     "require": {
         "aws/aws-sdk-php": "^3.233",
         "vlucas/phpdotenv": "^5.4",
-        "react/zmq": "^0.4.0"
+        "react/zmq": "^0.4.0",
+        "ramsey/uuid": "^4.4"
     }
 }
