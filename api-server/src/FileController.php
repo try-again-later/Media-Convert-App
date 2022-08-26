@@ -8,82 +8,75 @@ use ZMQContext;
 use ZMQ;
 
 use Ramsey\Uuid\Uuid;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
 
 class FileController
 {
     public const MAX_SIZE = 100 * 1024 * 1024; // 100 Mb
     public const ALLOWED_FILES = ['video/webm', 'video/mp4'];
 
-    private string $filesUploadDirectory;
+    public const UPLOADED_VIDEOS_BUCKET = 'uploaded-videos';
 
-    public function __construct(?string $filesUploadDirectory = null)
+    public function __construct(
+        private S3Client $s3Client,
+    )
     {
-        if (isset($filesUploadDirectory)) {
-            $this->filesUploadDirectory = $filesUploadDirectory;
-        } else {
-            $this->filesUploadDirectory =
-                dirname(__DIR__) .
-                DIRECTORY_SEPARATOR .
-                'uploads' .
-                DIRECTORY_SEPARATOR;
-        }
     }
 
-    public function create()
+    public function create(): string
     {
         if (
             !isset($_FILES['file']) ||
             !is_string($_FILES['file']['name']) ||
             $_FILES['file']['error'] !== UPLOAD_ERR_OK
         ) {
-            Response::json(
+            return Response::json(
                 Response::HTTP_BAD_REQUEST,
                 ['error' => 'You can only upload exactly one file at a time.']
             );
-            die();
         }
 
         $tempName = $_FILES['file']['tmp_name'];
 
         if (filesize($tempName) > self::MAX_SIZE) {
             $maxHumanSize = FileUtils::bytesToHumanString(self::MAX_SIZE);
-            Response::json(
+            return Response::json(
                 Response::HTTP_BAD_REQUEST,
                 ['error' => "Max file upload size is $maxHumanSize."]
             );
-            die();
         }
 
         $mimeType = FileUtils::getMimeType($tempName);
         if (!in_array(strtolower($mimeType), self::ALLOWED_FILES, strict: true)) {
-            Response::json(
+            return Response::json(
                 Response::HTTP_BAD_REQUEST,
                 ['error' => "Invalid file format. File format '$mimeType' is not allowed."]
             );
-            die();
         }
 
-        $extension = FileUtils::getExtensionFromMimeType($mimeType) ?: '';
-
-        $uploadPath = '';
+        $newFileName = null;
         while (true) {
             $uuid = Uuid::uuid4();
-            $uploadPath = $this->filesUploadDirectory . $uuid->toString() . $extension;
+            $extension = FileUtils::getExtensionFromMimeType($mimeType);
+            $newFileName = $uuid . $extension;
 
-            if (!file_exists($uploadPath)) {
+            if (!$this->s3Client->doesObjectExist(self::UPLOADED_VIDEOS_BUCKET, $newFileName)) {
                 break;
             }
         }
+        if ($newFileName == null) {
+            return Response::json(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-        $newFileName = pathinfo($uploadPath, PATHINFO_BASENAME);
-
-        $moveSuccess = move_uploaded_file($tempName, $uploadPath);
-        if (!$moveSuccess) {
-            Response::json(
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-                ['error' => 'Internal server error.'],
-            );
-            die();
+        try {
+            $this->s3Client->putObject([
+                'Bucket' => self::UPLOADED_VIDEOS_BUCKET,
+                'Key' => $newFileName,
+                'SourceFile' => $tempName,
+            ]);
+        } catch (S3Exception) {
+            return Response::json(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $context = new ZMQContext();
@@ -91,10 +84,9 @@ class FileController
         $socket->connect('tcp://localhost:5555');
         $socket->send($newFileName);
 
-        Response::json(
+        return Response::json(
             Response::HTTP_OK,
             ['message' => "File '$newFileName' successfully uploaded!"],
         );
-        die();
     }
 }

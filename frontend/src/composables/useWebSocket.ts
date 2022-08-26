@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { Status } from '../components/Retry/RetryComponent';
+import { Status } from '@components/Retry/RetryComponent';
 
 export function useWebSocket(endpoint: string) {
   const status = ref<Status>('first-try');

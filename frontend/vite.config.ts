@@ -26,6 +26,10 @@ export default defineConfig({
         find: '@components',
         replacement: resolve(__dirname, 'src', 'components'),
       },
+      {
+        find: '@composables',
+        replacement: resolve(__dirname, 'src', 'composables'),
+      },
     ],
   },
   server: {

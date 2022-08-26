@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Status, Workload } from './RetryComponent';
+import { Status, Workload } from '@components/Retry/RetryComponent';
 
-import StatusIcon from './StatusIcon.vue';
+import StatusIcon from '@components/Retry/StatusIcon.vue';
 import Spinner from '@components/icons/Spinner.vue';
 
 import { useIntervalFn } from '@vueuse/core';
-import { ref, watch, nextTick, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const emit = defineEmits<{
   (e: 'update:status', value: Status): void;

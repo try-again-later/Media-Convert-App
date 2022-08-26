@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Status } from './RetryComponent';
+import { Status } from '@components/Retry/RetryComponent';
 import { ExclamationTriangleIcon, CheckBadgeIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps<{

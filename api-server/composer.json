@@ -10,7 +10,9 @@
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "php -S localhost:8080 -c ./php.ini -t ./public"
-        ]
+        ],
+        "migrate": "php -c ./php.ini ./src/migrate.php",
+        "migrate:fresh": "php -c ./php.ini ./src/migrate.php fresh"
     },
     "require": {
         "aws/aws-sdk-php": "^3.233",

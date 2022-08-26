@@ -10,10 +10,14 @@ class Response
     public const HTTP_OK = 200;
     public const HTTP_INTERNAL_SERVER_ERROR = 500;
 
-    public static function json(int $httpCode, array $data): void
+    public static function json(int $httpCode, array $data = []): string
     {
+        if (empty($data) && $httpCode === self::HTTP_INTERNAL_SERVER_ERROR) {
+            $data['error'] = 'Internal server error.';
+        }
+
         http_response_code($httpCode);
         header('Content-Type: application/json');
-        echo json_encode($data);
+        return json_encode($data);
     }
 }

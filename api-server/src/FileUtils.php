@@ -34,12 +34,12 @@ class FileUtils
     }
 
     /**
-     * Returns `false` in case it fails.
+     * Returns an empty string in case it fails.
      */
     public static function getExtensionFromMimeType(string $mimeType): string | false
     {
         if (!isset(self::MIME_TYPES_TO_EXTENSIONS[strtolower($mimeType)])) {
-            return false;
+            return '';
         }
         return '.' . self::MIME_TYPES_TO_EXTENSIONS[strtolower($mimeType)];
     }
