@@ -9,7 +9,7 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "php -S localhost:8080 -d variables_order=EGPCS -t ./public"
+            "php -S localhost:8080 -d variables_order=EGPCS -d upload_max_filesize=40M -d post_max_size=40M -t ./public"
         ]
     },
     "require": {

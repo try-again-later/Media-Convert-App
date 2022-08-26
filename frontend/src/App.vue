@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { PaperClipIcon } from '@heroicons/vue/24/outline';
 import Retry from './components/Retry/RetryComponent.vue';
+import ProgressBar from './components/ProgressBar.vue';
 
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { Status } from './components/Retry/RetryComponent';
+import axios from 'axios';
 
 const props = defineProps<{
   websocketsServer: string;
@@ -47,6 +49,9 @@ const retryConnection = async () => {
 
 const fileInput = ref<HTMLInputElement>();
 
+const uploadingFile = ref(false);
+const fileUploadProgress = ref(0);
+
 const onFileChosen = async () => {
   const file = fileInput.value?.files?.[0];
   if (file == null) {
@@ -55,15 +60,27 @@ const onFileChosen = async () => {
 
   const formData = new FormData();
   formData.append('file', file);
-  const uploadResult = await fetch(props.apiServer + '/upload', {
-    method: 'POST',
-    mode: 'cors',
-    body: formData,
-  });
 
-  if (!uploadResult.ok) {
-    console.error(':(');
-  }
+  uploadingFile.value = true;
+  fileUploadProgress.value = 0;
+
+  await nextTick();
+
+  await axios
+    .post(`${props.apiServer}/upload`, formData, {
+      onUploadProgress: (progressEvent) => {
+        fileUploadProgress.value = Math.min(
+          Math.max(progressEvent.loaded / progressEvent.total, 0),
+          1,
+        );
+      },
+    })
+    .then(() => {
+      uploadingFile.value = false;
+    })
+    .catch(() => {
+      uploadingFile.value = false;
+    });
 };
 </script>
 
@@ -71,7 +88,7 @@ const onFileChosen = async () => {
   <main class="p-4">
     <h1 class="text-3xl font-semibold text-center mb-12">Media Convert App</h1>
 
-    <section>
+    <section class="flex flex-col items-center gap-8">
       <h2 class="sr-only">Upload new file</h2>
 
       <div class="flex justify-center">
@@ -82,11 +99,17 @@ const onFileChosen = async () => {
           id="file"
           class="peer sr-only"
         />
-        <label for="file" class="btn gap-2 btn-primary">
+        <label
+          for="file"
+          class="btn gap-2 btn-primary"
+          :class="{ loading: uploadingFile, 'btn-disabled': uploadingFile }"
+        >
           <PaperClipIcon class="w-6 h-6" />
           <span>Upload</span>
         </label>
       </div>
+
+      <ProgressBar :progress="fileUploadProgress" class="max-w-sm" />
     </section>
 
     <aside class="toast">
