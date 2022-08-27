@@ -5,7 +5,7 @@ declare(strict_types = 1);
 use Aws\S3\S3Client;
 use Dotenv\Dotenv;
 
-use TryAgainLater\MediaConvertAppApi\FileController;
+use TryAgainLater\MediaConvertAppApi\Controllers\FileController;
 use TryAgainLater\MediaConvertAppApi\S3BucketAdapter;
 
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);

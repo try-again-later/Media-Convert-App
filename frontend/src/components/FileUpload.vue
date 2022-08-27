@@ -15,6 +15,7 @@ const props = withDefaults(
     action: string;
     fileKeyName?: string;
     errorKeyName?: string;
+    token?: string;
   }>(),
   {
     fileKeyName: 'file',
@@ -35,6 +36,9 @@ const onFileChosen = async () => {
 
   const formData = new FormData();
   formData.append(props.fileKeyName, file);
+  if (props.token != null) {
+    formData.append('token', props.token);
+  }
 
   uploading.value = true;
   uploadProgress.value = 0;

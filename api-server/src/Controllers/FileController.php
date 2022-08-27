@@ -2,13 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace TryAgainLater\MediaConvertAppApi;
+namespace TryAgainLater\MediaConvertAppApi\Controllers;
+
+use TryAgainLater\MediaConvertAppApi\{Response, FileUtils, S3BucketAdapter};
 
 use ZMQContext;
 use ZMQ;
 
 use Aws\S3\S3Client;
 use MongoDB\Client as MongoClient;
+use TryAgainLater\MediaConvertAppApi\Models\User;
 
 class FileController
 {
@@ -21,6 +24,7 @@ class FileController
     public function __construct(
         private S3Client $s3Client,
         private MongoClient $mongoClient,
+        private User $user,
     )
     {
     }
@@ -76,12 +80,22 @@ class FileController
         $socket->connect('tcp://localhost:5555');
         $socket->send($newFileName);
 
+        $this->user->addVideo($url);
+
         return Response::json(
             Response::HTTP_OK,
             [
                 'message' => "File '$newFileName' successfully uploaded!",
                 'url' => $url,
             ],
+        );
+    }
+
+    public function index()
+    {
+        return Response::json(
+            Response::HTTP_OK,
+            $this->user->videos(),
         );
     }
 }
