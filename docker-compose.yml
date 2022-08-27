@@ -5,18 +5,40 @@ services:
     container_name: media-convert-app-minio
     image: minio/minio:latest
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - '${MINIO_PORT}:9000'
+      - '${MINIO_CONSOLE_PORT}:9001'
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-    command: server --console-address ":9001" /data
+    command: server --console-address ":${MINIO_CONSOLE_PORT}" /data
 
   rabbitmq:
     container_name: media-convert-app-rabbitmq
     image: rabbitmq:3.10.7-management
     ports:
-      - '15672:15672'
-      - '5672:5672'
+      - '${RABBITMQ_MANAGEMENT_PORT}:15672'
+      - '${RABBITMQ_PORT}:5672'
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+  mongo:
+    container_name: media-convert-app-mongo
+    image: mongo
+    ports:
+      - '${MONGO_PORT}:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+
+  mongo-express:
+    container_name: media-convert-app-mongo-express
+    image: mongo-express
+    restart: always
+    ports:
+      - '${MONGO_EXPRESS_PORT}:8081'
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_EXPRESS_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_EXPRESS_PASSWORD}
+      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_EXPRESS_USER}:${MONGO_EXPRESS_PASSWORD}@mongo:27017
+    depends_on:
+      - mongo

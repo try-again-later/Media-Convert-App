@@ -7,9 +7,8 @@ namespace TryAgainLater\MediaConvertAppApi;
 use ZMQContext;
 use ZMQ;
 
-use Ramsey\Uuid\Uuid;
 use Aws\S3\S3Client;
-use Aws\S3\Exception\S3Exception;
+use MongoDB\Client as MongoClient;
 
 class FileController
 {
@@ -17,9 +16,11 @@ class FileController
     public const ALLOWED_FILES = ['video/webm', 'video/mp4'];
 
     public const UPLOADED_VIDEOS_BUCKET = 'uploaded-videos';
+    public const VIDEO_EXPIRATION_TIME = '+24 hours';
 
     public function __construct(
         private S3Client $s3Client,
+        private MongoClient $mongoClient,
     )
     {
     }
@@ -55,27 +56,18 @@ class FileController
             );
         }
 
-        $newFileName = null;
-        while (true) {
-            $uuid = Uuid::uuid4();
-            $extension = FileUtils::getExtensionFromMimeType($mimeType);
-            $newFileName = $uuid . $extension;
+        $uploadedVideos = new S3BucketAdapter($this->s3Client, self::UPLOADED_VIDEOS_BUCKET);
 
-            if (!$this->s3Client->doesObjectExist(self::UPLOADED_VIDEOS_BUCKET, $newFileName)) {
-                break;
-            }
-        }
-        if ($newFileName == null) {
-            return Response::json(Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $newFileName = $uploadedVideos->getUniqueFileName(
+            extension: FileUtils::getExtensionFromMimeType($mimeType)
+        );
 
-        try {
-            $this->s3Client->putObject([
-                'Bucket' => self::UPLOADED_VIDEOS_BUCKET,
-                'Key' => $newFileName,
-                'SourceFile' => $tempName,
-            ]);
-        } catch (S3Exception) {
+        $url = $uploadedVideos->uploadFile(
+            key: $newFileName,
+            filePath: $tempName,
+            expires: self::VIDEO_EXPIRATION_TIME,
+        );
+        if ($url === false) {
             return Response::json(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -86,7 +78,10 @@ class FileController
 
         return Response::json(
             Response::HTTP_OK,
-            ['message' => "File '$newFileName' successfully uploaded!"],
+            [
+                'message' => "File '$newFileName' successfully uploaded!",
+                'url' => $url,
+            ],
         );
     }
 }

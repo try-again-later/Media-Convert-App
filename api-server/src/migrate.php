@@ -6,23 +6,12 @@ use Aws\S3\S3Client;
 use Dotenv\Dotenv;
 
 use TryAgainLater\MediaConvertAppApi\FileController;
+use TryAgainLater\MediaConvertAppApi\S3BucketAdapter;
 
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('PROJECT_ROOT_PATH', dirname(__DIR__, levels: 2) . DIRECTORY_SEPARATOR);
 
 require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-function truncateBucket(S3Client $s3Client, string $bucket) {
-    $objects = $s3Client->getIterator('ListObjects', [
-        'Bucket' => $bucket,
-    ]);
-    foreach ($objects as $object) {
-        $s3Client->deleteObject([
-            'Bucket' => $bucket,
-            'Key' => $object['Key'],
-        ]);
-    }
-}
 
 $fresh = false;
 if (isset($argv[1]) && $argv[1] === 'fresh') {
@@ -31,7 +20,11 @@ if (isset($argv[1]) && $argv[1] === 'fresh') {
 
 $dotenv = Dotenv::createImmutable(PROJECT_ROOT_PATH);
 $dotenv->safeLoad();
-$dotenv->required(['MINIO_ENDPOINT', 'MINIO_ROOT_USER', 'MINIO_ROOT_PASSWORD']);
+$dotenv->required([
+    'MINIO_ENDPOINT',
+    'MINIO_ROOT_USER',
+    'MINIO_ROOT_PASSWORD',
+]);
 
 $s3Client = new S3Client([
     'version' => 'latest',
@@ -44,8 +37,10 @@ $s3Client = new S3Client([
     ],
 ]);
 
+$uploadedVideosBucket = new S3BucketAdapter($s3Client, FileController::UPLOADED_VIDEOS_BUCKET);
+
 if ($fresh && $s3Client->doesBucketExist(FileController::UPLOADED_VIDEOS_BUCKET)) {
-    truncateBucket($s3Client, FileController::UPLOADED_VIDEOS_BUCKET);
+    $uploadedVideosBucket->truncateBucket();
 
     $s3Client->deleteBucket([
         'Bucket' => FileController::UPLOADED_VIDEOS_BUCKET,
