@@ -4,8 +4,12 @@ declare(strict_types = 1);
 
 namespace TryAgainLater\MediaConvertAppApi\Models;
 
+use DateTimeImmutable;
+
 use MongoDB\{Client as MongoClient, Collection as MongoCollection};
 use Ramsey\Uuid\Uuid;
+
+use TryAgainLater\MediaConvertAppApi\Controllers\FileController;
 
 class User
 {
@@ -71,13 +75,23 @@ class User
     {
     }
 
-    public function addVideo(string $videoUrl)
+    public function addVideo(
+        string $key,
+        string $url,
+        string $originalName,
+        DateTimeImmutable $uploadedAt,
+        DateTimeImmutable $expiresAt,
+        ?string $thumbnailUrl = null,
+    )
     {
         $users = self::getCollection($this->mongoClient);
         $videoData = [
-            'url' => $videoUrl,
-            'uploaded_at' => 'test',
-            'expires_at' => 'test...',
+            'key' => $key,
+            'url' => $url,
+            'original_name' => $originalName,
+            'uploaded_at' => $uploadedAt->format(FileController::DATE_FORMAT),
+            'expires_at' => $expiresAt->format(FileController::DATE_FORMAT),
+            'thumbnail_url' => $thumbnailUrl,
         ];
         $users->updateOne(
             ['token' => $this->token()],

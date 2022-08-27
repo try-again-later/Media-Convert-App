@@ -6,8 +6,8 @@ import { ref, nextTick } from 'vue';
 import axios from 'axios';
 
 const emit = defineEmits<{
-  (e: 'file-uploaded', response: any): void;
-  (e: 'error', response: any): void;
+  (e: 'file-uploaded', data: any): void;
+  (e: 'error', data: any): void;
 }>();
 
 const props = withDefaults(

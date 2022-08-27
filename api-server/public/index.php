@@ -13,6 +13,8 @@ use TryAgainLater\MediaConvertAppApi\Response;
 
 header("Access-Control-Allow-Origin: *");
 
+date_default_timezone_set('UTC');
+
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('PROJECT_ROOT_PATH', dirname(__DIR__, levels: 2) . DIRECTORY_SEPARATOR);
 
@@ -73,6 +75,7 @@ try {
             s3Client: getS3Client(),
             mongoClient: $mongoClient,
             user: $user,
+            temporaryFilesFolder: ROOT_PATH . 'tmp' . DIRECTORY_SEPARATOR,
         );
 
         if (Request::uriMatches('/upload')) {

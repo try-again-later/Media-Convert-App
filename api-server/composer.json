@@ -19,6 +19,7 @@
         "vlucas/phpdotenv": "^5.4",
         "react/zmq": "^0.4.0",
         "ramsey/uuid": "^4.4",
-        "mongodb/mongodb": "^1.12"
+        "mongodb/mongodb": "^1.12",
+        "nesbot/carbon": "^2.61"
     }
 }

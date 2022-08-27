@@ -37,16 +37,22 @@ $s3Client = new S3Client([
     ],
 ]);
 
-$uploadedVideosBucket = new S3BucketAdapter($s3Client, FileController::UPLOADED_VIDEOS_BUCKET);
+$migrateBucket = function (string $bucketName) use ($s3Client, $fresh)
+{
+    $bucket = new S3BucketAdapter($s3Client, $bucketName);
 
-if ($fresh && $s3Client->doesBucketExist(FileController::UPLOADED_VIDEOS_BUCKET)) {
-    $uploadedVideosBucket->truncateBucket();
+    if ($fresh && $s3Client->doesBucketExist($bucketName)) {
+        $bucket->truncateBucket();
 
-    $s3Client->deleteBucket([
-        'Bucket' => FileController::UPLOADED_VIDEOS_BUCKET,
+        $s3Client->deleteBucket([
+            'Bucket' => $bucketName,
+        ]);
+    }
+
+    $s3Client->createBucket([
+        'Bucket' => $bucketName,
     ]);
-}
+};
 
-$s3Client->createBucket([
-    'Bucket' => FileController::UPLOADED_VIDEOS_BUCKET,
-]);
+$migrateBucket(FileController::UPLOADED_VIDEOS_BUCKET);
+$migrateBucket(FileController::UPLAODED_VIDEOS_THUMBNAILS_BUCKET);
