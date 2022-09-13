@@ -54,7 +54,7 @@ class S3BucketAdapter
         string $key,
         string $filePath,
         string $expires,
-    ): string | null
+    ): string | bool
     {
         try {
             $this->s3Client->putObject([
@@ -73,7 +73,7 @@ class S3BucketAdapter
             );
             return (string) $presignedRequest->getUri();
         } catch (S3Exception) {
-            return null;
+            return false;
         }
     }
 }

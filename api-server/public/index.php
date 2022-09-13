@@ -11,7 +11,10 @@ use TryAgainLater\MediaConvertAppApi\Models\User;
 use TryAgainLater\MediaConvertAppApi\Request;
 use TryAgainLater\MediaConvertAppApi\Response;
 
-header("Access-Control-Allow-Origin: *");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, HEAD, OPTIONS, POST, PUT');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
 
 date_default_timezone_set('UTC');
 
@@ -91,6 +94,14 @@ try {
         } else {
             echo Response::json(Response::HTTP_OK, ['token' => $user->token()]);
         }
+    } else if (Request::post() && Request::uriMatches('/auth-check')) {
+        $mongoClient = getMongoClient();
+        $user = User::auth($mongoClient);
+        if ($user === false) {
+            echo Response::text(Response::HTTP_UNAUTHORIZED);
+            die();
+        }
+        echo Response::text(Response::HTTP_OK, 'OK');
     }
 } catch (Throwable $error) {
     echo Response::json(Response::HTTP_INTERNAL_SERVER_ERROR);

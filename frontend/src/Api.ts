@@ -1,4 +1,5 @@
 import axios from 'axios';
+import to from 'await-to-js';
 
 export class Video {
   public constructor(
@@ -18,6 +19,10 @@ export class Video {
       data['thumbnail_url'],
     );
   }
+
+  public static sortByDate(videoA: Video, videoB: Video): number {
+    return videoB.expiresAt.getTime() - videoA.expiresAt.getTime();
+  }
 }
 
 export class Api {
@@ -27,14 +32,9 @@ export class Api {
     return `${this.apiServer}/auth`;
   }
 
-  // returns a token to use for subsequent API requests
   public async auth(): Promise<string | null> {
-    try {
-      const response = await axios.post(this.authUrl());
-      return response.data['token'];
-    } catch {
-      return null;
-    }
+    const response = await axios.post(this.authUrl());
+    return response.data['token'];
   }
 
   public videosUrl(token: string): string {
@@ -42,16 +42,31 @@ export class Api {
   }
 
   public async videos(token: string): Promise<Video[]> {
-    try {
-      const response = await axios.get(this.videosUrl(token));
-      const videos: Video[] = [];
-      for (const videoData of response.data.videos) {
-        videos.push(Video.parseFromJson(videoData));
-      }
-      return videos;
-    } catch {
-      return [];
+    const response = await axios.get(this.videosUrl(token));
+    const videos: Video[] = [];
+    for (const videoData of response.data.videos) {
+      videos.push(Video.parseFromJson(videoData));
     }
+    return videos;
+  }
+
+  public authCheckUrl(): string {
+    return `${this.apiServer}/auth-check`;
+  }
+
+  public async authCheck(token: string): Promise<boolean> {
+    const params = new URLSearchParams();
+    params.append('token', token);
+
+    const [authCheckError, authCheckResponse] = await to(axios.post(this.authCheckUrl(), params));
+    if (authCheckResponse == null) {
+      if (axios.isAxiosError(authCheckError) && authCheckError.response?.status == 401) {
+        return false;
+      } else {
+        throw new Error('Failed to check if user is authenticated.');
+      }
+    }
+    return true;
   }
 
   public uploadUrl(): string {

@@ -8,6 +8,8 @@ import { Api, Video } from '@root/Api';
 
 import { onMounted, ref } from 'vue';
 import { useStorage } from '@vueuse/core';
+import axios, { AxiosError } from 'axios';
+import to from 'await-to-js';
 
 const props = defineProps<{
   websocketsServer: string;
@@ -23,15 +25,19 @@ const userToken = useStorage<string>('user-token', null);
 const videos = ref<Video[]>([]);
 
 onMounted(async () => {
-  if (userToken.value == null) {
-    userToken.value = await api.auth();
+  if (userToken.value == null || !(await api.authCheck(userToken.value))) {
+    const [_, fetchedUserToken] = await to(api.auth());
+    if (fetchedUserToken == null) {
+      throw new Error('Failed to authenticate.');
+    }
+    userToken.value = fetchedUserToken;
   }
 
-  if (userToken.value != null) {
-    videos.value = (await api.videos(userToken.value)).sort(
-      (a, b) => b.expiresAt.getTime() - a.expiresAt.getTime(),
-    );
+  const [_, fetchedVideos] = await to(api.videos(userToken.value));
+  if (fetchedVideos == null) {
+    throw new Error('Failed to fetch videos.');
   }
+  videos.value = fetchedVideos.sort(Video.sortByDate);
 });
 
 const onFileUploaded = (data: any) => {
