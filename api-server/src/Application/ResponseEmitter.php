@@ -9,9 +9,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class ResponseEmitter extends SlimResponseEmitter
 {
-    /**
-     * @inheritdoc
-     */
+    /** @inheritdoc */
     public function emit(Response $response): void
     {
         $response = $response

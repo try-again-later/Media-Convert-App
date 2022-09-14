@@ -5,12 +5,16 @@ declare(strict_types=1);
 use DI\ContainerBuilder;
 use Slim\Factory\{AppFactory, ServerRequestCreatorFactory};
 use Dotenv\Dotenv;
-
+use MongoDB\Client;
 use TryAgainLater\MediaConvertAppApi\Application\{HttpErrorHandler, ResponseEmitter, Settings};
+use TryAgainLater\MediaConvertAppApi\Domain\User\UserRepository;
+use MongoDB\BSON\ObjectId;
+use TryAgainLater\MediaConvertAppApi\Domain\User\User;
+use TryAgainLater\MediaConvertAppApi\Domain\Video\Video;
 
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
-require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 define('PROJECT_ROOT_PATH', dirname(__DIR__, levels: 2) . DIRECTORY_SEPARATOR);
+require_once ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 date_default_timezone_set('UTC');
 
@@ -42,6 +46,9 @@ $settings($containerBuilder);
 
 $dependencies = require ROOT_PATH . 'app' . DIRECTORY_SEPARATOR . 'dependencies.php';
 $dependencies($containerBuilder);
+
+$repositories = require ROOT_PATH . 'app' . DIRECTORY_SEPARATOR . 'repositories.php';
+$repositories($containerBuilder);
 
 $container = $containerBuilder->build();
 
