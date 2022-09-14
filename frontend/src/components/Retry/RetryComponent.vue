@@ -111,6 +111,7 @@ watch(
 <template>
   <transition>
     <article
+      v-cloak
       v-show="shown"
       class="alert shadow-md"
       :class="{
