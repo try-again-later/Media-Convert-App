@@ -39,7 +39,9 @@ class ActionPayload implements JsonSerializable
 
         if ($this->data !== null) {
             $payload['data'] = $this->data;
-        } else if ($this->error !== null) {
+        }
+
+        if ($this->error !== null) {
             $payload['error'] = $this->error;
         }
 
