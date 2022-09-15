@@ -55,6 +55,9 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+$middleware = require ROOT_PATH . 'app' . DIRECTORY_SEPARATOR . 'middleware.php';
+$middleware($app);
+
 $routes = require ROOT_PATH . 'app' . DIRECTORY_SEPARATOR . 'routes.php';
 $routes($app);
 

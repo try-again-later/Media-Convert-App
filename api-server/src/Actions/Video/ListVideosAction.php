@@ -24,6 +24,7 @@ class ListVideosAction extends Action
     {
         return $this->respondWithData([
             'videos' => [],
+            'auth.check' => $this->request->getAttribute('auth.check'),
         ]);
     }
 }
