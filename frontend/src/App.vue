@@ -38,7 +38,7 @@ onMounted(async () => {
 });
 
 function onFileUploaded(data: any) {
-  videos.value.push(Video.parseFromJson(data));
+  videos.value.push(Video.parseFromJson(data['data']['video']));
   videos.value.sort(Video.sortByDate);
 };
 
@@ -47,9 +47,6 @@ function deleteFile(key: string) {
     videos.value.findIndex((video) => video.key == key),
     1,
   );
-
-  for (const deletedVideo of deletedVideos) {
-  }
 };
 </script>
 
@@ -63,6 +60,7 @@ function deleteFile(key: string) {
       <FileUpload
         :action="api.uploadUrl()"
         :token="userToken"
+        file-key-name="video"
         @error="(error) => out.error(error)"
         @file-uploaded="onFileUploaded"
       />

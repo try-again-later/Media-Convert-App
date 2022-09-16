@@ -6,7 +6,7 @@ use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use Psr\Http\Message\{ResponseInterface as Response, ServerRequestInterface as Request};
 
-use TryAgainLater\MediaConvertAppApi\Actions\Auth\{AuthAction, AuthCheckACtion};
+use TryAgainLater\MediaConvertAppApi\Actions\Auth\{AuthAction, AuthCheckAction};
 use TryAgainLater\MediaConvertAppApi\Actions\Video\{DeleteVideoAction, ListVideosAction, VideoUploadAction};
 use TryAgainLater\MediaConvertAppApi\Application\Settings;
 use TryAgainLater\MediaConvertAppApi\Middleware\{
