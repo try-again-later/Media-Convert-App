@@ -13,6 +13,7 @@ return function (ContainerBuilder $containerBuilder) {
             'logErrors' => true,
             'logErrorDetails' => true,
             'uploadDirectory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR,
+            'videoMaxSize' => 100 * 1024 * 1024,
             'minio' => [
                 'endpoint' => $_ENV['MINIO_ENDPOINT'],
                 'key' => $_ENV['MINIO_ROOT_USER'],

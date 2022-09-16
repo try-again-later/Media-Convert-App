@@ -65,7 +65,10 @@ class S3BucketAdapter
     {
         while (true) {
             $uuid = Uuid::uuid4();
-            $newFileName = $uuid . $extension;
+            $newFileName = $uuid;
+            if (!empty($extension)) {
+                $newFileName .= '.' . $extension;
+            }
 
             if (!$this->s3Client->doesObjectExist($this->bucketName, $newFileName)) {
                 break;

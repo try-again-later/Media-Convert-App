@@ -14,6 +14,7 @@ use TryAgainLater\MediaConvertAppApi\Middleware\{
     FileUploadOptions,
     WithFileUploadsMiddleware,
 };
+use TryAgainLater\MediaConvertAppApi\Util\MimeType;
 
 return function (App $app) {
     /** @var Settings */
@@ -36,8 +37,11 @@ return function (App $app) {
                     new FileUploadOptions(
                         name: 'video',
                         uploadDirectory: $settings->get('uploadDirectory'),
-                        maxSize: 100 * 1024 * 1024,
-                        allowedMimeTypes: ['video/webm', 'video/mp4'],
+                        maxSize: $settings->get('videoMaxSize'),
+                        allowedMimeTypes: [
+                            MimeType::VIDEO_WEBM,
+                            MimeType::VIDEO_MP4,
+                        ],
                     ),
                 ));
         })

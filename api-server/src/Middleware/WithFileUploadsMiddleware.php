@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace TryAgainLater\MediaConvertAppApi\Middleware;
 
-use Psr\Http\Message\{ServerRequestInterface as Request, ResponseInterface as Response, UploadedFileInterface};
+use Psr\Http\Message\{
+    ServerRequestInterface as Request,
+    ResponseInterface as Response,
+    UploadedFileInterface,
+};
 use Psr\Http\Server\{MiddlewareInterface as Middleware, RequestHandlerInterface as RequestHandler};
 use Slim\Exception\HttpBadRequestException;
 
-use TryAgainLater\MediaConvertAppApi\Util\FileUtils;
+use TryAgainLater\MediaConvertAppApi\Util\{FileUtils, MimeType};
 
 class FileUploadOptions
 {
@@ -66,7 +70,7 @@ class WithFileUploadsMiddleware implements Middleware
         if ($this->options->maxSize > 0 && filesize($uploadedFilePath) > $this->options->maxSize) {
             $maxSizeForHumans = FileUtils::bytesToHumanString($this->options->maxSize);
             throw new HttpBadRequestException(
-                $this->request,
+                $request,
                 "Max file upload size is {$maxSizeForHumans}.",
             );
         }
@@ -75,15 +79,37 @@ class WithFileUploadsMiddleware implements Middleware
         if (
             $this->options->allowedMimeTypes !== null &&
             !in_array(
-                strtolower($uploadedFileMimeType),
+                $uploadedFileMimeType,
                 $this->options->allowedMimeTypes,
                 strict: true,
             )
         ) {
-            throw new HttpBadRequestException(
-                $this->request,
-                "Invalid file type. Mime type '{$uploadedFileMimeType}' is not allowed.",
+            $allowedMimeTypes = implode(
+                separator: ', ',
+                array: array_map(
+                    fn (MimeType $mimeType) => $mimeType->value,
+                    $this->options->allowedMimeTypes,
+                ),
             );
+
+            throw new HttpBadRequestException(
+                $request,
+                "Invalid file type. These are the allowed MIME types: {$allowedMimeTypes}.",
+            );
+        }
+
+        // in case the MIME type is correct but the extension on the client's file is messed up
+        $correctedExtension = $uploadedFileMimeType->getExtension();
+        $pathInfo = pathinfo($uploadedFilePath);
+        if ($correctedExtension !== $pathInfo['extension']) {
+            $correctedFilePath =
+                ($pathInfo['dirname'] ? $pathInfo['dirname'] . DIRECTORY_SEPARATOR : '') .
+                $pathInfo['filename'] .
+                '.' .
+                $correctedExtension;
+
+            rename($uploadedFilePath, $correctedFilePath);
+            $uploadedFilePath = $correctedFilePath;
         }
 
         $request = $request->withAttribute(
