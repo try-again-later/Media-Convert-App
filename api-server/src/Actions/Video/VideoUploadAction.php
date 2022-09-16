@@ -5,26 +5,15 @@ declare(strict_types=1);
 namespace TryAgainLater\MediaConvertAppApi\Actions\Video;
 
 use Carbon\CarbonImmutable;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\{ResponseInterface as Response};
 
 use TryAgainLater\MediaConvertAppApi\Domain\User\User;
-use TryAgainLater\MediaConvertAppApi\Domain\Video\{Video, VideoRepository};
+use TryAgainLater\MediaConvertAppApi\Domain\Video\{Video};
 use TryAgainLater\MediaConvertAppApi\Util\S3BucketAdapter;
 
 class VideoUploadAction extends VideoAction
 {
     public const UPLOADED_VIDEO_EXPIRATION_TIME = '+24 hours';
-
-    private ContainerInterface $container;
-
-    public function __construct(
-        VideoRepository $videoRepository,
-        ContainerInterface $container,
-    ) {
-        parent::__construct($videoRepository);
-        $this->container = $container;
-    }
 
     /** @inheritdoc */
     protected function action(): Response

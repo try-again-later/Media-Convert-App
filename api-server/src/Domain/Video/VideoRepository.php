@@ -16,5 +16,5 @@ interface VideoRepository
 
     public function updateVideo(Video $video): void;
 
-    public function deleteVideo(Video $video): void;
+    public function deleteVideo(User $owner, string $key): void;
 }

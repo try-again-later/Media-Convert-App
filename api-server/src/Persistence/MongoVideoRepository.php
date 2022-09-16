@@ -67,7 +67,7 @@ class MongoVideoRepository implements VideoRepository
             throw new DomainRecordNotFoundException;
         }
 
-        if ($pushResult->getModifiedCount() !== 1) {
+        if ($pushResult->getModifiedCount() !== 1 || !$pushResult->isAcknowledged()) {
             throw new PersistenceException;
         }
     }
@@ -93,32 +93,32 @@ class MongoVideoRepository implements VideoRepository
             throw new DomainRecordNotFoundException;
         }
 
-        if ($updateResult->getModifiedCount() !== 1) {
+        if ($updateResult->getModifiedCount() !== 1 || !$updateResult->isAcknowledged()) {
             throw new PersistenceException;
         }
     }
 
     /** @inheritdoc */
-    public function deleteVideo(Video $video): void
+    public function deleteVideo(User $owner, string $key): void
     {
         $users = $this->getUsersCollection();
 
         $pullResult = $users->updateOne(
             [
-                'token' => $video->getOwner()->getToken(),
+                'token' => $owner->getToken(),
             ],
             [
                 '$pull' => [
-                    'videos' => ['key' => $video->getKey()],
+                    'videos' => ['key' => $key],
                 ],
             ],
         );
 
-        if ($pullResult->getMatchedCount() !== 1) {
+        if ($pullResult->getMatchedCount() !== 1 || $pullResult->getModifiedCount() !== 1) {
             throw new DomainRecordNotFoundException;
         }
 
-        if ($pullResult->getModifiedCount() !== 1) {
+        if (!$pullResult->isAcknowledged()) {
             throw new PersistenceException;
         }
     }

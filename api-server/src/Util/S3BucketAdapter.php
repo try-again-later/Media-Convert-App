@@ -104,4 +104,12 @@ class S3BucketAdapter
 
         return [$key, (string) $presignedRequest->getUri()];
     }
+
+    public function deleteFile(string $key)
+    {
+        $this->s3Client->deleteObject([
+            'Bucket' => $this->bucketName,
+            'Key' => $key,
+        ]);
+    }
 }
