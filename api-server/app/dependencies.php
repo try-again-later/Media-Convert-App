@@ -10,6 +10,7 @@ use Psr\Container\ContainerInterface;
 use MongoDB\Client as MongoClient;
 
 use TryAgainLater\MediaConvertAppApi\Application\Settings;
+use TryAgainLater\MediaConvertAppApi\Services\VideoThumbnailService;
 use TryAgainLater\MediaConvertAppApi\Util\S3BucketAdapter;
 
 return function (ContainerBuilder $containerBuilder) {
@@ -52,5 +53,7 @@ return function (ContainerBuilder $containerBuilder) {
 
         'videosThumbnailsBucket' => autowire(S3BucketAdapter::class)
             ->constructor(get(S3ClientInterface::class), 'videos-thumbnails'),
+
+        VideoThumbnailService::class => autowire(VideoThumbnailService::class),
     ]);
 };

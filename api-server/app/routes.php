@@ -28,6 +28,8 @@ return function (App $app) {
 
     $app
         ->group('/videos', function (RouteCollectorProxy $group) use ($settings) {
+            $videosSettings = $settings->get('videos');
+
             $group
                 ->get('', ListVideosAction::class);
 
@@ -36,8 +38,8 @@ return function (App $app) {
                 ->add(new WithFileUploadsMiddleware(
                     new FileUploadOptions(
                         name: 'video',
-                        uploadDirectory: $settings->get('uploadDirectory'),
-                        maxSize: $settings->get('videoMaxSize'),
+                        uploadDirectory: $videosSettings['uploadDirectory'],
+                        maxSize: $videosSettings['maxSize'],
                         allowedMimeTypes: [
                             MimeType::VIDEO_WEBM,
                             MimeType::VIDEO_MP4,

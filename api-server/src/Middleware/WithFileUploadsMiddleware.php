@@ -56,7 +56,7 @@ class WithFileUploadsMiddleware implements Middleware
 
         if ($uploadedFile->getError() !== UPLOAD_ERR_OK) {
             throw new HttpBadRequestException(
-                $this->request,
+                $request,
                 'Failed to upload the file.',
             );
         }

@@ -12,8 +12,6 @@ return function (ContainerBuilder $containerBuilder) {
             'displayErrorDetails' => true,
             'logErrors' => true,
             'logErrorDetails' => true,
-            'uploadDirectory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR,
-            'videoMaxSize' => 100 * 1024 * 1024,
             'minio' => [
                 'endpoint' => $_ENV['MINIO_ENDPOINT'],
                 'key' => $_ENV['MINIO_ROOT_USER'],
@@ -24,6 +22,16 @@ return function (ContainerBuilder $containerBuilder) {
                 'port' => intval($_ENV['MONGO_PORT']),
                 'user' => $_ENV['MONGO_USER'],
                 'password' => $_ENV['MONGO_PASSWORD'],
+            ],
+            'thumbnails' => [
+                'outputDirectory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR,
+                'width' => 320,
+                'height' => 320,
+            ],
+            'videos' => [
+                'uploadDirectory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR,
+                'maxSize' => 100 * 1024 * 1024,
+                'expirationTime' => '+24 hours',
             ],
         ]),
     ]);
