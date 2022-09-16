@@ -75,11 +75,15 @@ class S3BucketAdapter
         return $newFileName;
     }
 
+    /**
+     * @return array{0: string, 1: string}
+     */
     public function uploadFile(
-        string $key,
         string $filePath,
         string $expires,
-    ): string {
+    ): array {
+        $key = $this->getUniqueFileName(pathinfo($filePath, PATHINFO_EXTENSION));
+
         $this->s3Client->putObject([
             'Bucket' => $this->bucketName,
             'Key' => $key,
@@ -94,6 +98,7 @@ class S3BucketAdapter
             command: $getObjectCommand,
             expires: $expires,
         );
-        return (string) $presignedRequest->getUri();
+
+        return [$key, (string) $presignedRequest->getUri()];
     }
 }
