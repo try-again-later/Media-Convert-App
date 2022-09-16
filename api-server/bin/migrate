@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+
+<?php
+
+use Aws\S3\S3ClientInterface;
+use TryAgainLater\MediaConvertAppApi\Domain\User\UserRepository;
+use TryAgainLater\MediaConvertAppApi\Util\S3BucketAdapter;
+
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+
+$fresh = false;
+if (isset($argv[1]) && $argv[1] === 'fresh') {
+    $fresh = true;
+}
+
+/** @var S3ClientInterface */
+$s3Client = $container->get(S3ClientInterface::class);
+
+/** @var S3BucketAdapter */
+$uploadedVideosBucket = $container->get('videosBucket');
+$uploadedVideosBucket->migrate(fresh: $fresh);
+
+/** @var S3BucketAdapter */
+$videosThumbnailsBucket = $container->get('videosThumbnailsBucket');
+$videosThumbnailsBucket->migrate(fresh: $fresh);
+
+if ($fresh) {
+    /** @var UserRepository */
+    $userRepository = $container->get(UserRepository::class);
+    $userRepository->dropAll();
+}

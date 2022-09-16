@@ -8,7 +8,6 @@ import { Api, Video } from '@root/Api';
 
 import { onMounted, ref } from 'vue';
 import { useStorage } from '@vueuse/core';
-import axios, { AxiosError } from 'axios';
 import to from 'await-to-js';
 
 const props = defineProps<{
@@ -16,12 +15,10 @@ const props = defineProps<{
   apiServer: string;
 }>();
 
+const out = console;
 const api = new Api(props.apiServer);
-
 const { status: webSocketStatus, connect: webSocketConnect } = useWebSocket(props.websocketsServer);
-
 const userToken = useStorage<string>('user-token', null);
-
 const videos = ref<Video[]>([]);
 
 onMounted(async () => {
@@ -40,22 +37,17 @@ onMounted(async () => {
   videos.value = fetchedVideos.sort(Video.sortByDate);
 });
 
-const onFileUploaded = (data: any) => {
-  videos.value.push(Video.parseFromJson(data));
-  videos.value.sort((a, b) => b.expiresAt.getTime() - a.expiresAt.getTime());
+function onFileUploaded(data: any) {
+  videos.value.push(Video.parseFromJson(data['data']['video']));
+  videos.value.sort(Video.sortByDate);
 };
 
-const deleteFile = (key: string) => {
+function deleteFile(key: string) {
   const deletedVideos = videos.value.splice(
     videos.value.findIndex((video) => video.key == key),
     1,
   );
-
-  for (const deletedVideo of deletedVideos) {
-  }
 };
-
-const out = console;
 </script>
 
 <template>
@@ -68,6 +60,7 @@ const out = console;
       <FileUpload
         :action="api.uploadUrl()"
         :token="userToken"
+        file-key-name="video"
         @error="(error) => out.error(error)"
         @file-uploaded="onFileUploaded"
       />
@@ -96,21 +89,3 @@ const out = console;
     </aside>
   </main>
 </template>
-
-<style>
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(250px);
-}
-
-.list-leave-active {
-  position: absolute;
-}
-</style>

@@ -34,7 +34,7 @@ export class Api {
 
   public async auth(): Promise<string | null> {
     const response = await axios.post(this.authUrl());
-    return response.data['token'];
+    return response.data['data']['token'];
   }
 
   public videosUrl(token: string): string {
@@ -44,7 +44,7 @@ export class Api {
   public async videos(token: string): Promise<Video[]> {
     const response = await axios.get(this.videosUrl(token));
     const videos: Video[] = [];
-    for (const videoData of response.data.videos) {
+    for (const videoData of response.data['data']['videos']) {
       videos.push(Video.parseFromJson(videoData));
     }
     return videos;
@@ -70,6 +70,6 @@ export class Api {
   }
 
   public uploadUrl(): string {
-    return `${this.apiServer}/upload`;
+    return `${this.apiServer}/videos/create`;
   }
 }

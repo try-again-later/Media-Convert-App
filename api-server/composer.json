@@ -9,10 +9,10 @@
     "scripts": {
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "php -S localhost:8080 -c ./php.ini -t ./public"
+            "php -S localhost:8080 -c ./php.ini -t ./public ./app/dev-server.php"
         ],
-        "migrate": "php -c ./php.ini ./src/migrate.php",
-        "migrate:fresh": "php -c ./php.ini ./src/migrate.php fresh"
+        "migrate": "php -c ./php.ini ./bin/migrate",
+        "migrate:fresh": "php -c ./php.ini ./bin/migrate fresh"
     },
     "require": {
         "aws/aws-sdk-php": "^3.233",
@@ -20,6 +20,9 @@
         "react/zmq": "^0.4.0",
         "ramsey/uuid": "^4.4",
         "mongodb/mongodb": "^1.12",
-        "nesbot/carbon": "^2.61"
+        "nesbot/carbon": "^2.61",
+        "slim/slim": "4.*",
+        "slim/psr7": "^1.5",
+        "php-di/php-di": "^6.4"
     }
 }
