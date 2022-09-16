@@ -6,7 +6,7 @@ namespace TryAgainLater\MediaConvertAppApi\Persistence;
 
 use MongoDB\{Client as MongoClient, Collection as MongoCollection};
 use Ramsey\Uuid\Uuid;
-use TryAgainLater\MediaConvertAppApi\Domain\User\{User, UserNotFoundException, UserRepository};
+use TryAgainLater\MediaConvertAppApi\Domain\User\{User, UserRepository};
 
 class MongoUserRepository implements UserRepository
 {
@@ -20,6 +20,7 @@ class MongoUserRepository implements UserRepository
         return $this->mongoClient->app->users;
     }
 
+    /** @inheritdoc */
     public function generateNewToken(): string
     {
         $token = Uuid::uuid4()->toString();
@@ -74,5 +75,11 @@ class MongoUserRepository implements UserRepository
                 ],
             );
         }
+    }
+
+    /** @inheritdoc */
+    public function dropAll(): void
+    {
+        $this->mongoClient->app->dropCollection('users');
     }
 }

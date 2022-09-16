@@ -12,6 +12,7 @@ return function (ContainerBuilder $containerBuilder) {
             'displayErrorDetails' => true,
             'logErrors' => true,
             'logErrorDetails' => true,
+            'uploadDirectory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR,
             'minio' => [
                 'endpoint' => $_ENV['MINIO_ENDPOINT'],
                 'key' => $_ENV['MINIO_ROOT_USER'],

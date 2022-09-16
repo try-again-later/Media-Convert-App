@@ -18,6 +18,7 @@ class Video implements JsonSerializable
         private User $owner,
         private string $key,
         private DateTimeImmutable $expiresAt,
+        private DateTimeImmutable $uploadedAt,
         private string $originalName,
         private ?string $url = null,
         private ?string $thumbnailUrl = null,
@@ -32,6 +33,11 @@ class Video implements JsonSerializable
     public function getExpiresAt(): DateTimeImmutable
     {
         return $this->expiresAt;
+    }
+
+    public function getUploadedAt(): DateTimeImmutable
+    {
+        return $this->uploadedAt;
     }
 
     public function getUrl(): ?string
@@ -60,6 +66,7 @@ class Video implements JsonSerializable
         return [
             'key' => $this->getKey(),
             'expires_at' => $this->getExpiresAt()->format(self::DATE_FORMAT),
+            'uploaded_at' => $this->getUploadedAt()->format(self::DATE_FORMAT),
             'original_name' => $this->getOriginalName(),
             'url' => $this->getUrl(),
             'thumbnail_url' => $this->getThumbnailUrl(),

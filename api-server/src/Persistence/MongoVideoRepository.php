@@ -40,6 +40,7 @@ class MongoVideoRepository implements VideoRepository
                 owner: $owner,
                 key: $videoData['key'],
                 expiresAt: new CarbonImmutable($videoData['expires_at']),
+                uploadedAt: new CarbonImmutable($videoData['uploaded_at']),
                 originalName: $videoData['original_name'] ?? null,
                 url: $videoData['url'] ?? null,
                 thumbnailUrl: $videoData['thumbnail_url'] ?? null,

@@ -1,8 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace TryAgainLater\MediaConvertAppApi;
+namespace TryAgainLater\MediaConvertAppApi\Util;
+
+use Psr\Http\Message\UploadedFileInterface;
 
 class FileUtils
 {
@@ -36,7 +38,7 @@ class FileUtils
     /**
      * Returns an empty string in case it fails.
      */
-    public static function getExtensionFromMimeType(string $mimeType): string | false
+    public static function getExtensionFromMimeType(string $mimeType): string
     {
         if (!isset(self::MIME_TYPES_TO_EXTENSIONS[strtolower($mimeType)])) {
             return '';
@@ -55,5 +57,17 @@ class FileUtils
         }
 
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . self::UNITS[$factor];
+    }
+
+    public static function moveUploadedFile(
+        string $directory,
+        UploadedFileInterface $uploadedFile,
+    ): string {
+        $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+        $baseName = bin2hex(random_bytes(8));
+        $fileName = sprintf('%s.%0.8s', $baseName, $extension);
+
+        $uploadedFile->moveTo($directory . $fileName);
+        return $fileName;
     }
 }

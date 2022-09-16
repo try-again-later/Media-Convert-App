@@ -7,24 +7,13 @@ namespace TryAgainLater\MediaConvertAppApi\Actions\Video;
 use Carbon\Carbon;
 use Psr\Http\Message\ResponseInterface as Response;
 
-use TryAgainLater\MediaConvertAppApi\Actions\Action;
 use TryAgainLater\MediaConvertAppApi\Domain\User\User;
-use TryAgainLater\MediaConvertAppApi\Domain\Video\VideoRepository;
 
-class ListVideosAction extends Action
+class ListVideosAction extends VideoAction
 {
-    private VideoRepository $videoRepository;
-
-    public function __construct(VideoRepository $videoRepository)
-    {
-        parent::__construct();
-        $this->videoRepository = $videoRepository;
-    }
-
     /** @inheritdoc */
     protected function action(): Response
     {
-
         /** @var User */
         $owner = $this->request->getAttribute('auth.user');
 

@@ -10,5 +10,7 @@ interface UserRepository
 
     public function findUserWithToken(string $token): ?User;
 
+    public function dropAll(): void;
+
     public function save(User $user): void;
 }
