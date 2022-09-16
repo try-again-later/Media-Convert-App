@@ -5,12 +5,7 @@ declare(strict_types=1);
 use DI\ContainerBuilder;
 use Slim\Factory\{AppFactory, ServerRequestCreatorFactory};
 use Dotenv\Dotenv;
-use MongoDB\Client;
 use TryAgainLater\MediaConvertAppApi\Application\{HttpErrorHandler, ResponseEmitter, Settings};
-use TryAgainLater\MediaConvertAppApi\Domain\User\UserRepository;
-use MongoDB\BSON\ObjectId;
-use TryAgainLater\MediaConvertAppApi\Domain\User\User;
-use TryAgainLater\MediaConvertAppApi\Domain\Video\Video;
 
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('PROJECT_ROOT_PATH', dirname(__DIR__, levels: 2) . DIRECTORY_SEPARATOR);

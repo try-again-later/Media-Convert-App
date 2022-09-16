@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace TryAgainLater\MediaConvertAppApi\Domain\User;
 
+use JsonSerializable;
+use ReturnTypeWillChange;
+
 use MongoDB\BSON\ObjectId;
 
 use TryAgainLater\MediaConvertAppApi\Domain\Video\Video;
 
-class User
+class User implements JsonSerializable
 {
     /**
      * @param Video[] $videos
@@ -49,5 +52,14 @@ class User
     public function setVideos(array $videos): void
     {
         $this->videos = $videos;
+    }
+
+    #[ReturnTypeWillChange]
+    public function jsonSerialize(): array
+    {
+        return [
+            'token' => $this->getToken(),
+            '_id' => (string) $this->getId(),
+        ];
     }
 }

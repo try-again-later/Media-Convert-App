@@ -5,7 +5,8 @@ declare(strict_types=1);
 use DI\ContainerBuilder;
 use function DI\autowire;
 
-use TryAgainLater\MediaConvertAppApi\Domain\User\{UserRepository, VideoRepository};
+use TryAgainLater\MediaConvertAppApi\Domain\User\UserRepository;
+use TryAgainLater\MediaConvertAppApi\Domain\Video\VideoRepository;
 use TryAgainLater\MediaConvertAppApi\Persistence\{MongoUserRepository, MongoVideoRepository};
 
 return function (ContainerBuilder $containerBuilder) {

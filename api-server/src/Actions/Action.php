@@ -7,6 +7,8 @@ namespace TryAgainLater\MediaConvertAppApi\Actions;
 use Psr\Http\Message\{ResponseInterface as Response, ServerRequestInterface as Request};
 use Slim\Exception\{HttpNotFoundException, HttpBadRequestException};
 
+use TryAgainLater\MediaConvertAppApi\Domain\DomainRecordNotFoundException;
+
 abstract class Action
 {
     protected Request $request;
@@ -27,7 +29,11 @@ abstract class Action
         $this->response = $response;
         $this->args = $args;
 
-        return $this->action();
+        try {
+            return $this->action();
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
     }
 
     /**

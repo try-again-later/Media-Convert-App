@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TryAgainLater\MediaConvertAppApi\Actions;
 
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 class ActionPayload implements JsonSerializable
 {
@@ -30,7 +31,7 @@ class ActionPayload implements JsonSerializable
         return $this->error;
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         $payload = [
