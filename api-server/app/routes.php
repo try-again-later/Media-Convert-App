@@ -48,7 +48,7 @@ return function (App $app) {
                 ));
 
             $group
-                ->delete('/{key}', DeleteVideoAction::class);
+                ->post('/delete/{key}', DeleteVideoAction::class);
         })
         ->add(AuthGuardMiddleware::class);
 

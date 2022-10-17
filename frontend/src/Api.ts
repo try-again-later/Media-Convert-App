@@ -72,4 +72,15 @@ export class Api {
   public uploadUrl(): string {
     return `${this.apiServer}/videos/create`;
   }
+
+  public videoDeleteUrl(video: Video): string {
+    return `${this.apiServer}/videos/delete/${video.key}`;
+  }
+
+  public async deleteVideo(token: string, video: Video): Promise<void> {
+    const formData = new FormData();
+    formData.append('token', token);
+
+    await axios.post(this.videoDeleteUrl(video), formData);
+  }
 }

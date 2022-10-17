@@ -42,11 +42,15 @@ function onFileUploaded(data: any) {
   videos.value.sort(Video.sortByDate);
 };
 
-function deleteFile(key: string) {
+async function deleteVideo(key: string) {
   const deletedVideos = videos.value.splice(
     videos.value.findIndex((video) => video.key == key),
     1,
   );
+
+  for (const deletedVideo of deletedVideos) {
+    await api.deleteVideo(userToken.value, deletedVideo);
+  }
 };
 </script>
 
@@ -74,7 +78,7 @@ function deleteFile(key: string) {
           :video="video"
           v-for="video in videos"
           :key="video.key"
-          @video-deleted="deleteFile"
+          @video-deleted="deleteVideo"
           class="mb-4"
         />
       </TransitionGroup>
