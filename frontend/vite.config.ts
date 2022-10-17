@@ -30,6 +30,10 @@ export default defineConfig({
         find: '@composables',
         replacement: resolve(__dirname, 'src', 'composables'),
       },
+      {
+        find: '@api',
+        replacement: resolve(__dirname, 'src', 'api'),
+      },
     ],
   },
   server: {

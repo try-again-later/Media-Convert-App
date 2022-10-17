@@ -9,7 +9,8 @@
     "paths": {
       "@root/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
-      "@composables/*": ["./src/composables/*"]
+      "@composables/*": ["./src/composables/*"],
+      "@api/*": ["./src/api/*"]
     }
   }
 }

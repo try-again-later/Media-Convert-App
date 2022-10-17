@@ -4,7 +4,8 @@ import VideoCard from '@components/VideoCard.vue';
 import FileUpload from '@components/FileUpload.vue';
 import { useWebSocket } from '@composables/useWebSocket';
 
-import { Api, Video } from '@root/Api';
+import Api from '@api/Api';
+import { Video } from '@api/Video';
 
 import { onMounted, ref } from 'vue';
 import { useStorage } from '@vueuse/core';
@@ -16,21 +17,23 @@ const props = defineProps<{
 }>();
 
 const out = console;
+
 const api = new Api(props.apiServer);
+
 const { status: webSocketStatus, connect: webSocketConnect } = useWebSocket(props.websocketsServer);
 const userToken = useStorage<string>('user-token', null);
 const videos = ref<Video[]>([]);
 
 onMounted(async () => {
-  if (userToken.value == null || !(await api.authCheck(userToken.value))) {
-    const [_, fetchedUserToken] = await to(api.auth());
+  if (userToken.value == null || !(await api.auth.authCheck(userToken.value))) {
+    const [_, fetchedUserToken] = await to(api.auth.auth());
     if (fetchedUserToken == null) {
       throw new Error('Failed to authenticate.');
     }
     userToken.value = fetchedUserToken;
   }
 
-  const [_, fetchedVideos] = await to(api.videos(userToken.value));
+  const [_, fetchedVideos] = await to(api.video.listVideos(userToken.value));
   if (fetchedVideos == null) {
     throw new Error('Failed to fetch videos.');
   }
@@ -40,7 +43,7 @@ onMounted(async () => {
 function onFileUploaded(data: any) {
   videos.value.push(Video.parseFromJson(data['data']['video']));
   videos.value.sort(Video.sortByDate);
-};
+}
 
 async function deleteVideo(key: string) {
   const deletedVideos = videos.value.splice(
@@ -49,9 +52,9 @@ async function deleteVideo(key: string) {
   );
 
   for (const deletedVideo of deletedVideos) {
-    await api.deleteVideo(userToken.value, deletedVideo);
+    await api.video.deleteVideo(userToken.value, deletedVideo);
   }
-};
+}
 </script>
 
 <template>
@@ -62,7 +65,7 @@ async function deleteVideo(key: string) {
       <h2 class="sr-only">Upload new file</h2>
 
       <FileUpload
-        :action="api.uploadUrl()"
+        :action="api.video.urls.uploadVideo()"
         :token="userToken"
         file-key-name="video"
         @error="(error) => out.error(error)"
